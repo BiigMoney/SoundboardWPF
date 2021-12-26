@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace SoundboardWPF.Views
 {
@@ -24,5 +25,6 @@ namespace SoundboardWPF.Views
         {
             InitializeComponent();
         }
+
     }
 }

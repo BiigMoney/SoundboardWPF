@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,43 +12,24 @@ namespace SoundboardWPF.ViewModels
 {
     public class ShellViewModel : Conductor<object>
     {
-        XmlDocument doc = new XmlDocument();
+        public static XmlDocument doc = new XmlDocument();
 
-        public ArrayList MySounds = new ArrayList();
+        private static List<Sound> Sounds = new List<Sound>();
 
-        private Visibility _showEmpty = Visibility.Hidden;
-
-        public Visibility ShowEmpty
-        {
-            get { return _showEmpty; }
-            set { _showEmpty = value; }
-        }
-
-        private Visibility _showTable = Visibility.Hidden;
-
-        public Visibility ShowTable
-        {
-            get { return _showTable; }
-            set { _showTable = value; }
-        }
-
-        public ShellViewModel()
+        private ShellViewModel()
         {
             doc.PreserveWhitespace = true;
             doc.Load(@".\sounds.xml");
             XmlNodeList sounds = doc.SelectNodes("/sounds/sound");
             foreach (XmlNode item in sounds)
             {
-                MySounds.Add(new Sound(item.Attributes["name"].Value, item.Attributes["length"].Value, item.Attributes["path"].Value));
+                Sounds.Add(new Sound(item.Attributes["name"].Value, item.Attributes["length"].Value, item.Attributes["path"].Value));
             }
+        }
 
-            if(MySounds.Count > 0)
-            {
-                ShowTable = Visibility.Visible;
-            } else
-            {
-                ShowEmpty = Visibility.Visible;
-            }
+        public static List<Sound> GetSounds()
+        {
+            return Sounds;
         }
 
         public async void OpenMySounds()

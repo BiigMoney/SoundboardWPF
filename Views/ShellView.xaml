@@ -1,11 +1,11 @@
-﻿<mah:MetroWindow x:Class="SoundboardWPF.Views.ShellView"
+﻿<UserControl x:Class="SoundboardWPF.Views.ShellView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SoundboardWPF.Views"
         mc:Ignorable="d"
-        Title="ShellView" Height="450" Width="800"
+        Height="450" Width="800"
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -27,4 +27,4 @@
         <Button Grid.Column="5" Width="20" Height="20" HorizontalAlignment="Right" x:Name="OpenSettings">S</Button>
         <ContentControl Grid.Row="1" Grid.ColumnSpan="5" Grid.Column="1" x:Name="ActiveItem" HorizontalAlignment="Center"/>
     </Grid>
-</mah:MetroWindow>
+</UserControl>

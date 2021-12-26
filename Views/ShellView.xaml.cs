@@ -17,7 +17,7 @@ namespace SoundboardWPF.Views
     /// <summary>
     /// Interaction logic for ShellView.xaml
     /// </summary>
-    public partial class ShellView : Window
+    public partial class ShellView
     {
         public ShellView()
         {

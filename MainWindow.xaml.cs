@@ -83,18 +83,4 @@ namespace SoundboardWPF
         }
 
     }
-
-    public class Sound
-    {
-        public string Name { get; set; }
-        public String Length { get; set; }
-        public string Path { get; set; }
-
-        public Sound(string n, String l, string p)
-        {
-            Name = n;
-            Length = l;
-            Path = p;
-        }
-    }
 }
