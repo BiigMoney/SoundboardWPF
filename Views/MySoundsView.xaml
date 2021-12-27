@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <DataGrid ItemsSource="{Binding Sounds}" Visibility="{Binding ShowTable}">
+        <DataGrid x:Name="SoundList" Visibility="{Binding ShowTable}" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                 <DataGridTextColumn Header="Length" Binding="{Binding Length}"/>
@@ -27,5 +27,6 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <TextBlock Visibility="{Binding ShowEmpty}">You have no sounds, go add one!</TextBlock>
     </Grid>
 </UserControl>

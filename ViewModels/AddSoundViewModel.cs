@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using FFMpegCore;
+using Microsoft.Win32;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 using YoutubeExplode;
+using Caliburn.Micro;
 using YoutubeExplode.Videos.Streams;
+using static SoundboardWPF.ViewModels.ShellViewModel;
 
 namespace SoundboardWPF.ViewModels
 {
-    class AddSoundViewModel
+    class AddSoundViewModel : Screen
     {
         private string _name = "";
 
@@ -48,9 +51,48 @@ namespace SoundboardWPF.ViewModels
             set { _end = value; }
         }
 
+        private string _progress = "";
+
+        public string Progress
+        {
+            get { return _progress; }
+            set { _progress = value;
+                NotifyOfPropertyChange(() => Progress);
+            }
+        }
+
+        private bool _clipCheck = false;
+
+        public bool ClipCheck
+        {
+            get { return _clipCheck; }
+            set { _clipCheck = value; }
+        }
+
+        private Visibility _fileSelect = Visibility.Hidden;
+
+        public Visibility FileSelect
+        {
+            get { return _fileSelect; }
+            set {
+                _fileSelect = value;
+                NotifyOfPropertyChange(() => FileSelect);
+            }
+        }
+
+        private Visibility _youtubeSelect = Visibility.Hidden;
+
+        public Visibility YoutubeSelect
+        {
+            get { return _youtubeSelect; }
+            set { _youtubeSelect = value;
+                NotifyOfPropertyChange(() => YoutubeSelect);
+            }
+        }
+
         private String filename;
         private double length;
-        private void OpenFile(object sender, RoutedEventArgs e)
+        public void OpenFile(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             if (dialog.ShowDialog() == true)
@@ -61,7 +103,9 @@ namespace SoundboardWPF.ViewModels
                     TimeSpan l = reader.TotalTime;
                     length = l.TotalSeconds;
                     filename = dialog.FileName;
-                    LocalDisplay();
+                    FileSelect = Visibility.Visible;
+                    YoutubeSelect = Visibility.Hidden;
+                    Console.WriteLine(FileSelect);
                 }
                 else
                 {
@@ -70,30 +114,18 @@ namespace SoundboardWPF.ViewModels
             }
         }
 
-        private void Hide()
+        public void OpenYoutube(object sender, RoutedEventArgs e)
         {
-
-            NameBox.Visibility = Visibility.Hidden;
-            SaveButton.Visibility = Visibility.Hidden;
-            URLName.Visibility = Visibility.Hidden;
-            ClipRow.Visibility = Visibility.Hidden;
-            SaveYoutubeButton.Visibility = Visibility.Hidden;
-            ProgressText.Visibility = Visibility.Hidden;
+            FileSelect = Visibility.Hidden;
+            YoutubeSelect = Visibility.Visible;
+            Console.WriteLine(YoutubeSelect);
         }
 
-        private void LocalDisplay()
+        public void SaveSound(object sender, RoutedEventArgs e)
         {
-            NameBox.Visibility = Visibility.Visible;
-            SaveButton.Visibility = Visibility.Visible;
-        }
-
-        private void SaveSound(object sender, RoutedEventArgs e)
-        {
-            AddSoundToList(NameBox.Text, Math.Round(length, 2).ToString(), filename);
-
+            AddSoundToList(Name, Math.Round(length, 2).ToString(), filename);
+            FileSelect = Visibility.Hidden;
             MessageBox.Show("Successfully added sound.");
-            Hide();
-
         }
 
         public static void AddSoundToList(string name, string length, string path)
@@ -115,14 +147,7 @@ namespace SoundboardWPF.ViewModels
             doc.Save(@".\sounds.xml");
         }
 
-        private void OpenYoutube(object sender, RoutedEventArgs e)
-        {
-            URLName.Visibility = Visibility.Visible;
-            ClipRow.Visibility = Visibility.Visible;
-            SaveYoutubeButton.Visibility = Visibility.Visible;
-        }
-
-        private async void SaveYoutubeSound(object sender, RoutedEventArgs e)
+        public async void SaveYoutubeSound(object sender, RoutedEventArgs e)
         {
             var youtube = new YoutubeClient();
             string YoutubeLinkRegex = "(?:.+?)?(?:\\/v\\/|watch\\/|\\?v=|\\&v=|youtu\\.be\\/|\\/v=|^youtu\\.be\\/)([a-zA-Z0-9_-]{11})+";
@@ -131,31 +156,30 @@ namespace SoundboardWPF.ViewModels
             var regRes = regexExtractId.Match(URL);
             if (regRes.Success)
             {
-                ProgressText.Visibility = Visibility.Visible;
-                ProgressText.Text = "Fetching...";
+                Progress = "Fetching...";
                 var streamManifest = await youtube.Videos.Streams.GetManifestAsync(regRes.Groups[1].Value);
                 var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
-                ProgressText.Text = "Downloading...";
-                string VidName = URL + "." + streamInfo.Container;
-                string OutName = URL + ".mp3";
+                Progress = "Downloading...";
+                string VidName = regRes.Groups[1].Value + "." + streamInfo.Container;
+                string OutName = regRes.Groups[1].Value + ".mp3";
                 await youtube.Videos.Streams.DownloadAsync(streamInfo, VidName);
-                ProgressText.Text = "Converting...";
+                Progress = "Converting...";
 
                 TimeSpan begin = new TimeSpan();
                 TimeSpan end = new TimeSpan();
 
-                if (ClipCheck.IsChecked == true)
+                if (ClipCheck == true)
                 {
-                    begin = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(StartAtBox.Text).TotalSeconds) / 60);
-                    end = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(EndAtBox.Text).TotalSeconds) / 60);
+                    begin = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(Start).TotalSeconds) / 60);
+                    end = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(End).TotalSeconds) / 60);
                 }
                 await FFMpegArguments.FromFileInput(VidName).OutputToFile(OutName).ProcessAsynchronously();
 
-                if (ClipCheck.IsChecked == true)
+                if (ClipCheck == true)
                 {
-                    TrimMp3(OutName, URLNameBox.Text + "E.mp3", begin, end);
+                    TrimMp3(OutName, regRes.Groups[1].Value + "E.mp3", begin, end);
                     File.Delete(OutName);
-                    OutName = URLNameBox.Text + "E.mp3";
+                    OutName = regRes.Groups[1].Value + "E.mp3";
                     length = end.Subtract(begin).TotalSeconds;
                 }
                 else
@@ -164,9 +188,10 @@ namespace SoundboardWPF.ViewModels
                     TimeSpan l = reader.TotalTime;
                     length = l.TotalSeconds;
                 }
-                AddSoundToList(URLNameBox.Text, Math.Round(length, 2).ToString(), OutName);
+                AddSoundToList(Name, Math.Round(length, 2).ToString(), OutName);
                 File.Delete(VidName);
-                ProgressText.Visibility = Visibility.Hidden;
+                Progress = "";
+                YoutubeSelect = Visibility.Hidden;
                 MessageBox.Show("Success");
                 return;
             }

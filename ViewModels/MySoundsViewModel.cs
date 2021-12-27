@@ -14,12 +14,15 @@ namespace SoundboardWPF.ViewModels
 {
     public class MySoundsViewModel : Screen
     {
-        private List<Sound> sounds = GetSounds();
-        private static Visibility _showEmpty = Visibility.Hidden;
-        public static Visibility ShowEmpty
+        public List<Sound> sounds = GetSounds();
+        public BindableCollection<Sound> SoundList { get; set; }
+        private Visibility _showEmpty = Visibility.Hidden;
+        public Visibility ShowEmpty
         {
             get { return _showEmpty; }
-            set { _showEmpty = value; }
+            set { _showEmpty = value;
+                NotifyOfPropertyChange(() => ShowEmpty);
+            }
         }
 
         private static Visibility _showTable = Visibility.Hidden;
@@ -47,11 +50,12 @@ namespace SoundboardWPF.ViewModels
         public MySoundsViewModel()
         {
             SetVisible();
+            SoundList = new BindableCollection<Sound>(sounds);
         }
         public void PlaySound(object sender, RoutedEventArgs e)
         {
             Sound sound = (sender as Button).DataContext as Sound;
-            MainWindow.PlaySound(sound.Path);
+            //PlaySound(sound.Path);
 
         }
         public void DeleteSound(object sender, RoutedEventArgs e)

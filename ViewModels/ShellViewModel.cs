@@ -16,7 +16,7 @@ namespace SoundboardWPF.ViewModels
 
         private static List<Sound> Sounds = new List<Sound>();
 
-        private ShellViewModel()
+        public ShellViewModel()
         {
             doc.PreserveWhitespace = true;
             doc.Load(@".\sounds.xml");
@@ -25,6 +25,7 @@ namespace SoundboardWPF.ViewModels
             {
                 Sounds.Add(new Sound(item.Attributes["name"].Value, item.Attributes["length"].Value, item.Attributes["path"].Value));
             }
+            OpenMySounds();
         }
 
         public static List<Sound> GetSounds()

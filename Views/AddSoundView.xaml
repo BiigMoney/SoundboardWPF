@@ -21,13 +21,13 @@
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
-      <Button Click="OpenFile" Height="30" Width="125" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">Open File</Button>
-      <Button Click="OpenYoutube" Height="30" Width="125" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">Clip From Youtube</Button>
+      <Button x:Name="OpenFile" Height="30" Width="125" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">Open File</Button>
+      <Button x:Name="OpenYoutube" Height="30" Width="125" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">Clip From Youtube</Button>
     </Grid>
 
-    <TextBox x:Name="NameBox" Width="200" Height="30" Grid.Row="1" Visibility="Hidden"/>
-    <Button x:Name="SaveButton" Click="SaveSound" Height="30" Grid.Row="2" Width="75" Visibility="Hidden">Save</Button>
-    <Grid x:Name="URLName" Grid.Row="1" Visibility="Hidden">
+    <TextBox x:Name="NameBox" Width="200" Height="30" Grid.Row="1" Visibility="{Binding FileSelect}"/>
+    <Button x:Name="SaveSound" Height="30" Grid.Row="2" Width="75" Visibility="{Binding FileSelect}">Save</Button>
+        <Grid x:Name="URLName" Grid.Row="1" Visibility="{Binding YoutubeSelect}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
@@ -39,7 +39,7 @@
       <Label Content="Link:" VerticalAlignment="Center" Grid.Column="2"/>
       <TextBox Text="{Binding URL}" x:Name="URLBox" Width="200" Height="30" Grid.Column="3"/>
     </Grid>
-    <Grid Grid.Row="2" x:Name="ClipRow" Visibility="Hidden">
+        <Grid Grid.Row="2" x:Name="ClipRow" Visibility="{Binding YoutubeSelect}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
@@ -49,13 +49,13 @@
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
       <Label Content="Clip?" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-      <CheckBox Name="ClipCheck" HorizontalAlignment="Left" Grid.Column="1"/>
+      <CheckBox x:Name="ClipCheckBox" IsChecked="{Binding ClipCheck}" HorizontalAlignment="Left" Grid.Column="1"/>
       <Label Content="Start At:" Grid.Column="2" VerticalAlignment="Center"/>
-      <TextBox Text="{Binding Start}" x:Name="StartAtBox" Width="80" Height="30" Grid.Column="3" IsEnabled="{Binding ElementName=ClipCheck, Path=IsChecked}" />
+            <TextBox Text="{Binding Start}" x:Name="StartAtBox" Width="80" Height="30" Grid.Column="3" IsEnabled="{Binding ElementName=ClipCheckBox, Path=IsChecked}" />
       <Label Content="End At:" Grid.Column="4" VerticalAlignment="Center"/>
-      <TextBox Text="{Binding End}" x:Name="EndAtBox" Width="80" Height="30" Grid.Column="5" IsEnabled="{Binding ElementName=ClipCheck, Path=IsChecked}" />
+            <TextBox Text="{Binding End}" x:Name="EndAtBox" Width="80" Height="30" Grid.Column="5" IsEnabled="{Binding ElementName=ClipCheckBox, Path=IsChecked}" />
     </Grid>
-    <Button x:Name="SaveYoutubeButton" Click="SaveYoutubeSound" Height="30" Grid.Row="3" Width="75" Visibility="Hidden">Save</Button>
-    <TextBlock x:Name="ProgressText" Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Hidden">Progress: 0%</TextBlock>
+        <Button x:Name="SaveYoutubeSound" Height="30" Grid.Row="3" Width="75" Visibility="{Binding YoutubeSelect}">Save</Button>
+        <TextBlock Text="{Binding Progress}" Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding YoutubeSelect}"></TextBlock>
   </Grid>
 </UserControl>
