@@ -342,6 +342,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Models\MySounds.cs" />
+    <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\Sound.cs" />
+    <Compile Include="Models\SoundVault.cs" />
     <Compile Include="ViewModels\AddSoundViewModel.cs" />
     <Compile Include="ViewModels\BrowseSoundViewModel.cs" />
     <Compile Include="ViewModels\MySoundsViewModel.cs" />
@@ -432,8 +436,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

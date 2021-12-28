@@ -9,28 +9,31 @@ using System.Windows.Controls;
 using System.Xml;
 using SoundboardWPF.ViewModels;
 using static SoundboardWPF.ViewModels.ShellViewModel;
+using SoundboardWPF.Models;
 
 namespace SoundboardWPF.ViewModels
 {
     public class MySoundsViewModel : Screen
     {
-        public List<Sound> sounds = GetSounds();
+        public List<Sound> sounds = MySounds.Sounds;
         public BindableCollection<Sound> SoundList { get; set; }
-        private Visibility _showEmpty = Visibility.Hidden;
+        
         public Visibility ShowEmpty
         {
-            get { return _showEmpty; }
-            set { _showEmpty = value;
+            get { return MySounds.ShowEmpty; }
+            set { 
+                MySounds.ShowEmpty = value;
                 NotifyOfPropertyChange(() => ShowEmpty);
             }
         }
 
-        private static Visibility _showTable = Visibility.Hidden;
-
-        public static Visibility ShowTable
+        public Visibility ShowTable
         {
-            get { return _showTable; }
-            set { _showTable = value; }
+            get { return MySounds.ShowTable; }
+            set { 
+                MySounds.ShowTable = value;
+                NotifyOfPropertyChange(() => ShowTable);
+            }
         }
 
         private void SetVisible()
@@ -60,13 +63,8 @@ namespace SoundboardWPF.ViewModels
         }
         public void DeleteSound(object sender, RoutedEventArgs e)
         {
-            SetVisible();
             Sound sound = (sender as Button).DataContext as Sound;
-            List<Sound> sounds = GetSounds();
-            sounds.RemoveAll(snd => snd.Path == sound.Path);
-            XmlNode node = doc.SelectSingleNode(String.Format("/sounds/sound[@path='{0}']", sound.Path));
-            node.ParentNode.RemoveChild(node);
-            doc.Save(@".\sounds.xml");
+            MySounds.DeleteSound(sound.Path);
         }
     }
 }

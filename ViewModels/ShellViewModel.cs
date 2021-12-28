@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using SoundboardWPF.Models;
 
 namespace SoundboardWPF.ViewModels
 {
@@ -51,20 +52,6 @@ namespace SoundboardWPF.ViewModels
         public async void OpenSettings()
         {
             await ActivateItemAsync(new SettingsViewModel());
-        }
-
-        public class Sound
-        {
-            public string Name { get; set; }
-            public String Length { get; set; }
-            public string Path { get; set; }
-
-            public Sound(string n, String l, string p)
-            {
-                Name = n;
-                Length = l;
-                Path = p;
-            }
         }
 
     }

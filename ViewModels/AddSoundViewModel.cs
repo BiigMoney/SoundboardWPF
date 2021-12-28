@@ -13,7 +13,7 @@ using System.Xml;
 using YoutubeExplode;
 using Caliburn.Micro;
 using YoutubeExplode.Videos.Streams;
-using static SoundboardWPF.ViewModels.ShellViewModel;
+using SoundboardWPF.Models;
 
 namespace SoundboardWPF.ViewModels
 {
@@ -123,28 +123,9 @@ namespace SoundboardWPF.ViewModels
 
         public void SaveSound(object sender, RoutedEventArgs e)
         {
-            AddSoundToList(Name, Math.Round(length, 2).ToString(), filename);
+            MySounds.AddSound(Name, Math.Round(length, 2).ToString(), filename);
             FileSelect = Visibility.Hidden;
             MessageBox.Show("Successfully added sound.");
-        }
-
-        public static void AddSoundToList(string name, string length, string path)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.PreserveWhitespace = true;
-            doc.Load(@".\sounds.xml");
-            XmlNode sounds = doc.SelectSingleNode("/sounds");
-
-            XmlElement NewSound = doc.CreateElement("sound");
-
-            NewSound.SetAttribute("name", name);
-            NewSound.SetAttribute("length", length);
-            NewSound.SetAttribute("path", path);
-
-
-            sounds.AppendChild(NewSound);
-
-            doc.Save(@".\sounds.xml");
         }
 
         public async void SaveYoutubeSound(object sender, RoutedEventArgs e)
@@ -188,7 +169,7 @@ namespace SoundboardWPF.ViewModels
                     TimeSpan l = reader.TotalTime;
                     length = l.TotalSeconds;
                 }
-                AddSoundToList(Name, Math.Round(length, 2).ToString(), OutName);
+                MySounds.AddSound(Name, Math.Round(length, 2).ToString(), OutName);
                 File.Delete(VidName);
                 Progress = "";
                 YoutubeSelect = Visibility.Hidden;
