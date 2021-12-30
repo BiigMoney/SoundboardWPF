@@ -19,4 +19,15 @@ namespace SoundboardWPF.Models
             Path = p;
         }
     }
+
+    public class SoundVaultSound : Sound
+    {
+        public bool CanDownload { get; set; }
+        public int Likes { get; set; }
+
+        public SoundVaultSound(string n, string l, string p, bool canDownload) : base(n,  l,  p)
+        {
+            CanDownload = canDownload;
+        }
+    }
 }

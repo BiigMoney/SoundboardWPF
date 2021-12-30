@@ -13,25 +13,11 @@ namespace SoundboardWPF.ViewModels
 {
     public class ShellViewModel : Conductor<object>
     {
-        public static XmlDocument doc = new XmlDocument();
-
-        private static List<Sound> Sounds = new List<Sound>();
 
         public ShellViewModel()
         {
-            doc.PreserveWhitespace = true;
-            doc.Load(@".\sounds.xml");
-            XmlNodeList sounds = doc.SelectNodes("/sounds/sound");
-            foreach (XmlNode item in sounds)
-            {
-                Sounds.Add(new Sound(item.Attributes["name"].Value, item.Attributes["length"].Value, item.Attributes["path"].Value));
-            }
+            new MySounds();
             OpenMySounds();
-        }
-
-        public static List<Sound> GetSounds()
-        {
-            return Sounds;
         }
 
         public async void OpenMySounds()

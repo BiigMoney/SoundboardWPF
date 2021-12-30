@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using Amazon.S3;
+using Caliburn.Micro;
 using MySql.Data.MySqlClient;
 using SoundboardWPF.Models;
 using System;
@@ -8,13 +9,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace SoundboardWPF.ViewModels
 {
     class BrowseSoundViewModel : Screen
     {
-        private BindableCollection<Sound> _soundList;
-        public BindableCollection<Sound> SoundList { 
+        private BindableCollection<SoundVaultSound> _soundList;
+        public BindableCollection<SoundVaultSound> SoundList { 
             get { return _soundList; } 
             set {
                 _soundList = value;
@@ -59,12 +61,40 @@ namespace SoundboardWPF.ViewModels
             GetData.Start();
         }
 
+        public ICommand PlaySoundCommand { get; private set; }
+        public ICommand DownloadSoundCommand { get; private set; }
+
         private void GetSounds()
         {
+            PlaySoundCommand = new RelayCommand(path => SoundVault.PlaySound(path.ToString()));
+            DownloadSoundCommand = new RelayCommand(path =>
+            {
+                string name = SoundVault.sounds.Find(sound => sound.Path == path.ToString()).Name;
+                try
+                {
+                    SoundVault.DownloadSound(path.ToString(), name);
+                    SoundVault.sounds.Find(sound => sound.Path == path.ToString()).CanDownload = false;
+                    SoundList = new BindableCollection<SoundVaultSound>(SoundVault.sounds);
+                }
+                catch (AmazonS3Exception ex)
+                {
+                    if (ex.ErrorCode != null &&
+                    (ex.ErrorCode.Equals("InvalidAccessKeyId") ||
+                    ex.ErrorCode.Equals("InvalidSecurity")))
+                    {
+                        MessageBox.Show("Please check the provided AWS Credentials.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("An error occurred with the message '{0}' when reading an object", ex.Message);
+                    }
+                }
+                
+            });
             try
             {
                 SoundVault vault = new SoundVault();
-                SoundList = new BindableCollection<Sound>(SoundVault.sounds);
+                SoundList = new BindableCollection<SoundVaultSound>(SoundVault.sounds);
                 ShowTable = Visibility.Visible;
             }
             catch(MySqlException ex)
@@ -77,6 +107,5 @@ namespace SoundboardWPF.ViewModels
                 ShowLoading = Visibility.Hidden;
             }
         }
-
     }
 }

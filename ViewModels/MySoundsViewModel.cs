@@ -10,31 +10,45 @@ using System.Xml;
 using SoundboardWPF.ViewModels;
 using static SoundboardWPF.ViewModels.ShellViewModel;
 using SoundboardWPF.Models;
+using System.Windows.Input;
 
 namespace SoundboardWPF.ViewModels
 {
+    
     public class MySoundsViewModel : Screen
     {
-        public List<Sound> sounds = MySounds.Sounds;
-        public BindableCollection<Sound> SoundList { get; set; }
-        
+        private List<Sound> sounds = MySounds.Sounds;
+
+        private BindableCollection<Sound> _soundList;
+
+        public BindableCollection<Sound> SoundList { get { return _soundList; } set {
+                _soundList = value;
+                NotifyOfPropertyChange(() => SoundList);
+            } }
+
+        public ICommand PlaySoundCommand { get; private set; }
+        public ICommand DeleteSoundCommand { get; private set; }
+
+        private Visibility _showEmpty = Visibility.Hidden;
+
         public Visibility ShowEmpty
         {
-            get { return MySounds.ShowEmpty; }
-            set { 
-                MySounds.ShowEmpty = value;
+            get { return _showEmpty; }
+            set { _showEmpty = value;
                 NotifyOfPropertyChange(() => ShowEmpty);
             }
         }
 
+        private Visibility _showTable = Visibility.Hidden;
+
         public Visibility ShowTable
         {
-            get { return MySounds.ShowTable; }
-            set { 
-                MySounds.ShowTable = value;
+            get { return _showTable; }
+            set { _showTable = value;
                 NotifyOfPropertyChange(() => ShowTable);
             }
         }
+
 
         private void SetVisible()
         {
@@ -53,18 +67,18 @@ namespace SoundboardWPF.ViewModels
         public MySoundsViewModel()
         {
             SetVisible();
+            PlaySoundCommand = new RelayCommand(path => {
+                MySounds.PlaySound(path.ToString());
+                SoundList = new BindableCollection<Sound>(MySounds.Sounds);
+                SetVisible();
+            });
+            DeleteSoundCommand = new RelayCommand(path => {
+                MySounds.DeleteSound(path.ToString());
+                SoundList = new BindableCollection<Sound>(MySounds.Sounds);
+                SetVisible();
+            });
             SoundList = new BindableCollection<Sound>(sounds);
         }
-        public void PlaySound(object sender, RoutedEventArgs e)
-        {
-            Sound sound = (sender as Button).DataContext as Sound;
-            //PlaySound(sound.Path);
 
-        }
-        public void DeleteSound(object sender, RoutedEventArgs e)
-        {
-            Sound sound = (sender as Button).DataContext as Sound;
-            MySounds.DeleteSound(sound.Path);
-        }
     }
 }

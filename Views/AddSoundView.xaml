@@ -9,10 +9,10 @@
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="60"/>
-      <RowDefinition Height="30"/>
-      <RowDefinition Height="40"/>
-      <RowDefinition Height="60"/>
-      <RowDefinition Height="30"/>
+      <RowDefinition Height="50"/>
+      <RowDefinition Height="50"/>
+      <RowDefinition Height="50"/>
+      <RowDefinition Height="50"/>
     </Grid.RowDefinitions>
     <Grid Grid.Row="0">
       <Grid.ColumnDefinitions>
@@ -24,8 +24,8 @@
       <Button x:Name="OpenFile" Height="30" Width="125" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">Open File</Button>
       <Button x:Name="OpenYoutube" Height="30" Width="125" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">Clip From Youtube</Button>
     </Grid>
-
-    <TextBox x:Name="NameBox" Width="200" Height="30" Grid.Row="1" Visibility="{Binding FileSelect}"/>
+    <Label Visibility="{Binding FileSelect}" Grid.Row="1" VerticalAlignment="Center" Margin="90,0,0,0">Name: </Label>
+    <TextBox Text="{Binding Name}" Width="200" Height="30" Grid.Row="1" Visibility="{Binding FileSelect}"/>
     <Button x:Name="SaveSound" Height="30" Grid.Row="2" Width="75" Visibility="{Binding FileSelect}">Save</Button>
         <Grid x:Name="URLName" Grid.Row="1" Visibility="{Binding YoutubeSelect}">
       <Grid.ColumnDefinitions>
@@ -41,12 +41,13 @@
     </Grid>
         <Grid Grid.Row="2" x:Name="ClipRow" Visibility="{Binding YoutubeSelect}">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
       <Label Content="Clip?" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
       <CheckBox x:Name="ClipCheckBox" IsChecked="{Binding ClipCheck}" HorizontalAlignment="Left" Grid.Column="1"/>

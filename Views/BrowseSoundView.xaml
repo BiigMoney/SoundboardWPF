@@ -16,14 +16,14 @@
                 <DataGridTemplateColumn Header="Play">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button x:Name="PlaySound" CommandParameter="{Binding Path=Path}">Play</Button>
+                            <Button Command="{Binding Path=DataContext.PlaySoundCommand,  RelativeSource= {RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" CommandParameter="{Binding Path}">Play</Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Download">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button x:Name="DownloadSound" CommandParameter="{Binding Path=Path}">Download</Button>
+                            <Button IsEnabled="{Binding CanDownload}" Command="{Binding Path=DataContext.DownloadSoundCommand,  RelativeSource= {RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" CommandParameter="{Binding Path}">Download</Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
