@@ -20,6 +20,7 @@ namespace SoundboardWPF.Models
         static string bucketName = "my-bucket-of-sounds";
         static IAmazonS3 client = new AmazonS3Client(RegionEndpoint.USWest2);
         public static WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
+        public static WaveOut waveOut2 = new WaveOut(WaveCallbackInfo.FunctionCallback());
         public static string currentlyPlaying = "";
         public SoundVault()
         {
