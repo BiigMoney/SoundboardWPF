@@ -25,7 +25,14 @@ namespace SoundboardWPF.ViewModels
             }
         }
 
-        public int StartIndex;
+        private int _startIndex = Settings.SecondaryAudioDeviceID + 1;
+
+        public int StartIndex
+        {
+            get { return _startIndex; }
+            set { _startIndex = value; }
+        }
+
 
         private int _volume = Settings.Volume;
 
@@ -79,20 +86,17 @@ namespace SoundboardWPF.ViewModels
 
         public SettingsViewModel()
         {
-            new Settings();
+            Console.WriteLine(StartIndex);
             foreach(string device in Settings.AudioDevices)
             {
-                Console.WriteLine(device);
                 AudioDevices.Add(device);
             }
         }
 
         public void SaveSettings()
         {
-            foreach(string name in AudioDevices)
-            {
-                Console.WriteLine(name);
-            }
+            Settings.WriteNewConfig(Volume, SecondaryAudioDevice);
+            EnableSave = false;
         }
     }
 }

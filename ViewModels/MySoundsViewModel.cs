@@ -72,8 +72,8 @@ namespace SoundboardWPF.ViewModels
                 SoundList = new BindableCollection<Sound>(MySounds.Sounds);
                 SetVisible();
             });
-            DeleteSoundCommand = new RelayCommand(path => {
-                MySounds.DeleteSound(path.ToString());
+            DeleteSoundCommand = new RelayCommand(name => {
+                MySounds.DeleteSound(name.ToString());
                 SoundList = new BindableCollection<Sound>(MySounds.Sounds);
                 SetVisible();
             });

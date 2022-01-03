@@ -17,6 +17,7 @@ namespace SoundboardWPF.ViewModels
         public ShellViewModel()
         {
             new MySounds();
+            new Settings();
             OpenMySounds();
         }
 

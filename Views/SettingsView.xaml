@@ -22,7 +22,13 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">Secondary Audio Output Device:</TextBlock>
-            <ComboBox SelectedIndex="0" Grid.Column="2" x:Name="AudioDevices" SelectedItem="{Binding Path=SecondaryAudioDevice, Mode=OneWayToSource}"/>
+            <ComboBox SelectedIndex="{Binding StartIndex}" Grid.Column="2" x:Name="AudioDevices" SelectedItem="{Binding Path=SecondaryAudioDevice, Mode=OneWayToSource}"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Slider Maximum="100" Width="300" Grid.Column="1" TickPlacement="BottomRight" TickFrequency="10" x:Name="Volume" Value="{Binding Volume}"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Button x:Name="SaveSettings" Height="30" Width="50" IsEnabled="{Binding EnableSave}">Save</Button>
         </Grid>
     </Grid>
 </UserControl>

@@ -8,6 +8,7 @@ using IniParser.Model;
 using System.IO;
 using NAudio.Wave;
 using IniParser.Exceptions;
+using System.Windows;
 
 namespace SoundboardWPF.Models
 {
@@ -31,38 +32,54 @@ namespace SoundboardWPF.Models
             try
             {
                 data = parser.ReadFile("config.ini");
+                Volume = int.Parse(data["config"]["Volume"]);
+                string device = data["config"]["SecondaryOutputDevice"];
+                if (AudioDevices.Any(audio => audio == device))
+                {
+                    SecondaryOutputDevice = device;
+                    SecondaryAudioDeviceID = AudioDevices.FindIndex(audio => audio == device) - 1;
+                }
+                else
+                {
+                    SecondaryOutputDevice = "None";
+                    SecondaryAudioDeviceID = -1;
+                }
             }
             catch (ParsingException ex)
             {
-                Console.WriteLine(ex.ToString());
+                MessageBox.Show("Error " + ex.ToString());
                 WriteNewConfig(50, "None");
-                data = parser.ReadFile("config.ini");
             }
-            catch (AggregateException ex) {
-                Console.WriteLine(ex.ToString());
-                data = new IniData();
-                data["config"]["Volume"] = "50";
-                data["config"]["SecondaryOutputDevice"] = "None";
+            catch (Exception ex) {
+                MessageBox.Show("Error " + ex.ToString());
+                Volume = 50;
+                SecondaryAudioDeviceID = -1;
+                SecondaryOutputDevice = "None";
             }
-            finally
+        }
+
+        public static void WriteNewConfig(int volume, string device)
+        {
+            try
             {
-                Volume = int.Parse(data["config"]["Volume"]);
-                string device = data["config"]["SecondaryOutputDevice"];
-                if(AudioDevices.Any(audio => audio == device))
+                string lines = "[config]\nVolume=" + volume.ToString() + "\nSecondaryOutputDevice=" + device;
+                File.WriteAllText("config.ini", lines);
+                Volume = volume;
+                if (AudioDevices.Any(audio => audio == device))
                 {
                     SecondaryOutputDevice = device;
                     SecondaryAudioDeviceID = AudioDevices.FindIndex(audio => audio == device) - 1;
                 } else
                 {
                     SecondaryOutputDevice = "None";
+                    SecondaryAudioDeviceID = -1;
                 }
             }
-        }
-
-        private void WriteNewConfig(int volume, string device)
-        {
-            string lines = "[config]\nVolume=" + volume.ToString() + "\nSecondaryOutputDevice="  + device;
-            File.WriteAllText("config.ini", lines);
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                MessageBox.Show("Unable to access config file.");
+            }
         }
     }
 }

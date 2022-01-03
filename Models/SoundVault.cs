@@ -19,8 +19,8 @@ namespace SoundboardWPF.Models
         public static List<SoundVaultSound> sounds;
         static string bucketName = "my-bucket-of-sounds";
         static IAmazonS3 client = new AmazonS3Client(RegionEndpoint.USWest2);
-        public static WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
-        public static WaveOut waveOut2 = new WaveOut(WaveCallbackInfo.FunctionCallback());
+        public static WaveOut waveOut = new WaveOut();
+        public static WaveOut waveOut2 = new WaveOut();
         public static string currentlyPlaying = "";
         public SoundVault()
         {
@@ -51,25 +51,35 @@ namespace SoundboardWPF.Models
             }
         }
 
-        public static void PlaySound(string path)
+        public static void PlaySound(string url)
         {
-            Thread playThread = new Thread(() => PlayMp3FromUrl(path));
-            playThread.IsBackground = true;
-            playThread.Start();
-        }
-
-        private static void PlayMp3FromUrl(string url)
-        {
-            if(waveOut.PlaybackState == PlaybackState.Playing && currentlyPlaying == url)
+            PlaybackState playing = waveOut.PlaybackState;
+            if (playing == PlaybackState.Playing)
             {
                 waveOut.Stop();
+                waveOut.Dispose();
+                waveOut2.Stop();
+                waveOut2.Dispose();
+            }
+            if (playing == PlaybackState.Playing && currentlyPlaying == url)
+            {
                 return;
             }
-            if(waveOut.PlaybackState == PlaybackState.Playing)
-            {
-                waveOut.Stop();
-            }
             currentlyPlaying = url;
+
+            Thread t1 = new Thread(() => SecondSound(url, -1));
+            t1.IsBackground = true;
+            t1.Start();
+            if (Settings.SecondaryAudioDeviceID != -1)
+            {
+                Thread t2 = new Thread(() => SecondSound(url, Settings.SecondaryAudioDeviceID));
+                t2.IsBackground = true;
+                t2.Start();
+            }
+        }
+
+        private static void SecondSound(string url, int device)
+        {
             using (Stream ms = new MemoryStream())
             {
 
@@ -100,7 +110,8 @@ namespace SoundboardWPF.Models
                     (ex.ErrorCode.Equals("InvalidAccessKeyId") ||
                     ex.ErrorCode.Equals("InvalidSecurity")))
                     {
-                        MessageBox.Show("Please check the provided AWS Credentials.");                }
+                        MessageBox.Show("Please check the provided AWS Credentials.");
+                    }
                     else
                     {
                         MessageBox.Show("An error occurred with the message '{0}' when reading an object", ex.Message);
@@ -114,16 +125,41 @@ namespace SoundboardWPF.Models
                         WaveFormatConversionStream.CreatePcmStream(
                             new Mp3FileReader(ms))))
                 {
-                    using (waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
+                    if(device == -1)
                     {
+                        waveOut = new WaveOut();
+                        waveOut.Volume = (float)Settings.Volume / 100;
                         waveOut.Init(blockAlignedStream);
                         waveOut.Play();
                         while (waveOut.PlaybackState == PlaybackState.Playing)
                         {
                             Thread.Sleep(100);
                         }
+                        waveOut.Dispose();
                         currentlyPlaying = "";
+                    } else
+                    {
+                        waveOut2 = new WaveOut();
+                        waveOut2.Volume = (float)Settings.Volume / 100;
+                        waveOut2.DeviceNumber = device;
+                        try
+                        {
+                            waveOut2.Init(blockAlignedStream);
+                            waveOut2.Play();
+                            while (waveOut2.PlaybackState == PlaybackState.Playing)
+                            {
+                                Thread.Sleep(100);
+                            }
+                            waveOut2.Dispose();
+                        } catch(Exception ex)
+                        {
+                            Console.WriteLine(ex.ToString());
+                            MessageBox.Show("Unable to play sound on secondary audio device, the selected audio device may not be compatible.");
+                        }
+                            
+               
                     }
+                    
                 }
             }
         }

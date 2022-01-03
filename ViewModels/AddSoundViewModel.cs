@@ -123,79 +123,108 @@ namespace SoundboardWPF.ViewModels
 
         public void SaveSound(object sender, RoutedEventArgs e)
         {
-            MySounds.AddSound(Name, Math.Round(length, 2).ToString(), filename);
-            FileSelect = Visibility.Hidden;
-            MessageBox.Show("Successfully added sound.");
+            if(MySounds.Sounds.Any(sound => sound.Name == Name))
+            {
+                MessageBox.Show("A sound with this name already exists.");
+            } else
+            {
+                MySounds.AddSound(Name, Math.Round(length, 2).ToString(), filename);
+                FileSelect = Visibility.Hidden;
+                MessageBox.Show("Successfully added sound.");
+            }
         }
 
         public async void SaveYoutubeSound(object sender, RoutedEventArgs e)
         {
-            var youtube = new YoutubeClient();
+            if (MySounds.Sounds.Any(sound => sound.Name == Name))
+            {
+                MessageBox.Show("A sound with this name already exists.");
+                return;
+            }
+
             string YoutubeLinkRegex = "(?:.+?)?(?:\\/v\\/|watch\\/|\\?v=|\\&v=|youtu\\.be\\/|\\/v=|^youtu\\.be\\/)([a-zA-Z0-9_-]{11})+";
             Regex regexExtractId = new Regex(YoutubeLinkRegex, RegexOptions.Compiled);
+            TimeSpan begin = new TimeSpan();
+            TimeSpan end = new TimeSpan();
+
+            if (ClipCheck)
+            {
+                try
+                {
+                    begin = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(Start).TotalSeconds) / 60);
+                    end = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(End).TotalSeconds) / 60);
+                    if (begin > end)
+                    {
+                        throw new ArgumentOutOfRangeException("end", "end should be greater than begin");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    MessageBox.Show("The start and end times you have provided are invalid.");
+                    return;
+                }
+            }
 
             var regRes = regexExtractId.Match(URL);
             if (regRes.Success)
             {
                 Progress = "Fetching...";
+                var youtube = new YoutubeClient();
                 var streamManifest = await youtube.Videos.Streams.GetManifestAsync(regRes.Groups[1].Value);
                 var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
                 Progress = "Downloading...";
-                string VidName = regRes.Groups[1].Value + "." + streamInfo.Container;
-                string OutName = regRes.Groups[1].Value + ".mp3";
+                string rand = Guid.NewGuid().ToString("n").Substring(0, 8);
+                string VidName = rand + "." + streamInfo.Container;
+                string OutName = rand + ".mp3";
                 await youtube.Videos.Streams.DownloadAsync(streamInfo, VidName);
                 Progress = "Converting...";
-
-                TimeSpan begin = new TimeSpan();
-                TimeSpan end = new TimeSpan();
-
-                if (ClipCheck == true)
+                try
                 {
-                    begin = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(Start).TotalSeconds) / 60);
-                    end = TimeSpan.FromSeconds(Convert.ToInt32(TimeSpan.Parse(End).TotalSeconds) / 60);
-                }
-                await FFMpegArguments.FromFileInput(VidName).OutputToFile(OutName).ProcessAsynchronously();
+                    await FFMpegArguments.FromFileInput(VidName).OutputToFile(OutName).ProcessAsynchronously();
 
-                if (ClipCheck == true)
+                    if (ClipCheck)
+                    {
+                        TrimMp3(OutName, rand + "E.mp3", begin, end);
+                        File.Delete(OutName);
+                        OutName = rand + "E.mp3";
+                        length = end.Subtract(begin).TotalSeconds;
+                    }
+                    else
+                    {
+                        Mp3FileReader reader = new Mp3FileReader(OutName);
+                        TimeSpan l = reader.TotalTime;
+                        length = l.TotalSeconds;
+                    }
+                } catch(Exception ex)
                 {
-                    TrimMp3(OutName, regRes.Groups[1].Value + "E.mp3", begin, end);
-                    File.Delete(OutName);
-                    OutName = regRes.Groups[1].Value + "E.mp3";
-                    length = end.Subtract(begin).TotalSeconds;
+                    Console.WriteLine(ex.ToString());
+                    MessageBox.Show("There was an error while converting the sound, the sound was not saved.");
+                    return;
                 }
-                else
-                {
-                    Mp3FileReader reader = new Mp3FileReader(OutName);
-                    TimeSpan l = reader.TotalTime;
-                    length = l.TotalSeconds;
-                }
+                
                 MySounds.AddSound(Name, Math.Round(length, 2).ToString(), OutName);
                 File.Delete(VidName);
                 Progress = "";
                 YoutubeSelect = Visibility.Hidden;
-                MessageBox.Show("Success");
-                return;
+                MessageBox.Show("Successfully added sound.");
             }
             else
             {
-                MessageBox.Show("Invalid URL");
-                return;
+                MessageBox.Show("The URL you have provided is invalid.");
             }
 
         }
-        void TrimMp3(string inputPath, string outputPath, TimeSpan? begin, TimeSpan? end)
+        void TrimMp3(string inputPath, string outputPath, TimeSpan begin, TimeSpan end)
         {
-            if (begin.HasValue && end.HasValue && begin > end)
-                throw new ArgumentOutOfRangeException("end", "end should be greater than begin");
-
             using (var reader = new Mp3FileReader(inputPath))
             using (var writer = File.Create(outputPath))
             {
                 Mp3Frame frame;
                 while ((frame = reader.ReadNextFrame()) != null)
-                    if (reader.CurrentTime >= begin || !begin.HasValue)
+                    if (reader.CurrentTime >= begin)
                     {
-                        if (reader.CurrentTime <= end || !end.HasValue)
+                        if (reader.CurrentTime <= end)
                             writer.Write(frame.RawData, 0, frame.RawData.Length);
                         else break;
                     }
