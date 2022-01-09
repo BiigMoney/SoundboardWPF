@@ -16,6 +16,7 @@ namespace SoundboardWPF.ViewModels
     class BrowseSoundViewModel : Screen
     {
         private BindableCollection<SoundVaultSound> _soundList;
+        private readonly int soundsPerPage = 1;
         public BindableCollection<SoundVaultSound> SoundList { 
             get { return _soundList; } 
             set {
@@ -30,6 +31,45 @@ namespace SoundboardWPF.ViewModels
             get { return _showLoading; }
             set { _showLoading = value;
                 NotifyOfPropertyChange(() => ShowLoading);
+            }
+        }
+
+        private int _currentPage = 1;
+
+        public int CurrentPage
+        {
+            get { return _currentPage; }
+            set
+            {
+                _currentPage = value;
+                if(_currentPage == 1)
+                {
+                    EnablePrev = false;
+                }
+            }
+        }
+
+        private bool _enablePrev = false;
+
+        public bool EnablePrev
+        {
+            get { return _enablePrev; }
+            set
+            {
+                _enablePrev = value;
+                NotifyOfPropertyChange(() => EnablePrev);
+            }
+        }
+
+        private bool _enableNext = false;
+
+        public bool EnableNext
+        {
+            get { return _enableNext; }
+            set
+            {
+                _enableNext = value;
+                NotifyOfPropertyChange(() => EnableNext);
             }
         }
 
@@ -64,6 +104,34 @@ namespace SoundboardWPF.ViewModels
         public ICommand PlaySoundCommand { get; private set; }
         public ICommand DownloadSoundCommand { get; private set; }
 
+        public void GoPrev()
+        {
+            CurrentPage -= 1;
+            SoundList = new BindableCollection<SoundVaultSound>(SoundVault.sounds.Skip(soundsPerPage*(CurrentPage-1)).Take(soundsPerPage));
+            if(CurrentPage == 1)
+            {
+                EnablePrev = false;
+            }
+            if (SoundVault.sounds.Count > CurrentPage * soundsPerPage)
+            {
+                EnableNext = true;
+            }
+        }
+
+        public void GoNext()
+        {
+            CurrentPage += 1;
+            SoundList = new BindableCollection<SoundVaultSound>(SoundVault.sounds.Skip(soundsPerPage * (CurrentPage - 1)).Take(soundsPerPage));
+            if(SoundVault.sounds.Count <= CurrentPage * soundsPerPage)
+            {
+                EnableNext = false;
+            }
+            if(CurrentPage == 2)
+            {
+                EnablePrev = true;
+            }
+        }
+
         private void GetSounds()
         {
             PlaySoundCommand = new RelayCommand(path => SoundVault.PlaySound(path.ToString()));
@@ -94,7 +162,11 @@ namespace SoundboardWPF.ViewModels
             try
             {
                 SoundVault vault = new SoundVault();
-                SoundList = new BindableCollection<SoundVaultSound>(SoundVault.sounds);
+                if(SoundVault.sounds.Count > soundsPerPage * CurrentPage)
+                {
+                    EnableNext = true;
+                }
+                SoundList = new BindableCollection<SoundVaultSound>(SoundVault.sounds.Take(soundsPerPage));
                 ShowTable = Visibility.Visible;
             }
             catch(MySqlException ex)

@@ -29,6 +29,6 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <TextBlock Visibility="{Binding ShowEmpty}">You have no sounds, go add one!</TextBlock>
+        <TextBlock Visibility="{Binding ShowEmpty}" HorizontalAlignment="Center">You have no sounds, go add one!</TextBlock>
     </Grid>
 </UserControl>

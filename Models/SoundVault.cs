@@ -30,7 +30,7 @@ namespace SoundboardWPF.Models
             try
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("select * from soundboard_sound limit 10", conn);
+                MySqlCommand cmd = new MySqlCommand("select * from soundboard_sound limit 200", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
