@@ -129,14 +129,22 @@ namespace SoundboardWPF.Models
                     {
                         waveOut = new WaveOut();
                         waveOut.Volume = (float)Settings.Volume / 100;
-                        waveOut.Init(blockAlignedStream);
-                        waveOut.Play();
-                        while (waveOut.PlaybackState == PlaybackState.Playing)
+                        try
                         {
-                            Thread.Sleep(100);
+                            waveOut.Init(blockAlignedStream);
+                            waveOut.Play();
+                            while (waveOut.PlaybackState == PlaybackState.Playing)
+                            {
+                                Thread.Sleep(100);
+                            }
+                            waveOut.Dispose();
+                            currentlyPlaying = "";
                         }
-                        waveOut.Dispose();
-                        currentlyPlaying = "";
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.ToString());
+                            MessageBox.Show("Unable to play sound.");
+                        }
                     } else
                     {
                         waveOut2 = new WaveOut();
@@ -151,10 +159,13 @@ namespace SoundboardWPF.Models
                                 Thread.Sleep(100);
                             }
                             waveOut2.Dispose();
-                        } catch(Exception ex)
+                        } catch(NAudio.MmException ex)
                         {
                             Console.WriteLine(ex.ToString());
                             MessageBox.Show("Unable to play sound on secondary audio device, the selected audio device may not be compatible.");
+                        } catch(Exception ex)
+                        {
+                            Console.WriteLine(ex.ToString());
                         }
                             
                

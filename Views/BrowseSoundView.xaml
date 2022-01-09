@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock Visibility="{Binding ShowLoading}">Loading...</TextBlock>
+        <TextBlock Visibility="{Binding ShowLoading}" HorizontalAlignment="Center">Loading...</TextBlock>
         <TextBlock Visibility="{Binding ShowError}">There was an error when trying to access the SoundVault.</TextBlock>
         <DataGrid x:Name="SoundList" AutoGenerateColumns="False" Visibility="{Binding ShowTable}">
             <DataGrid.Columns>
