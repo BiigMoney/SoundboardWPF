@@ -23,11 +23,12 @@ namespace SoundboardWPF.Models
     public class SoundVaultSound : Sound
     {
         public bool CanDownload { get; set; }
-        public int Likes { get; set; }
+        public string Likes { get; set; }
 
-        public SoundVaultSound(string n, string l, string p, bool canDownload) : base(n,  l,  p)
+        public SoundVaultSound(string n, string l, string p, bool canDownload, string likes) : base(n,  l,  p)
         {
             CanDownload = canDownload;
+            Likes = likes;
         }
     }
 }

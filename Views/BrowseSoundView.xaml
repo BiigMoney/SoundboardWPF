@@ -32,6 +32,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Likes" Binding="{Binding Likes}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

@@ -124,21 +124,33 @@ namespace SoundboardWPF.Models
 
             currentlyPlaying = path;
 
-            Thread t1 = new Thread(() => SecondSound(path, -1));
+            Mp3FileReader reader = null;
+            try
+            {
+                reader = new Mp3FileReader(path);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                MessageBox.Show("Unable to play sound, has the file been deleted?");
+                return;
+            }
+
+            Thread t1 = new Thread(() => SecondSound(path, -1, reader));
             t1.IsBackground = true;
             t1.Start();
             if (Settings.SecondaryAudioDeviceID != -1)
             {
-                Thread t2 = new Thread(() => SecondSound(path, Settings.SecondaryAudioDeviceID));
+                Mp3FileReader reader2 = new Mp3FileReader(path);
+                Thread t2 = new Thread(() => SecondSound(path, Settings.SecondaryAudioDeviceID, reader2));
                 t2.IsBackground = true;
                 t2.Start();
             }
 
         }
 
-        private static void SecondSound(string path, int device)
+        private static void SecondSound(string path, int device, Mp3FileReader reader)
         {
-            Mp3FileReader reader = new Mp3FileReader(path);
             if(device == -1)
             {
                 waveOut = new WaveOut();
@@ -156,7 +168,7 @@ namespace SoundboardWPF.Models
                 } catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
-                    MessageBox.Show("Unable to play sound, has the file been deleted?");
+                    MessageBox.Show("Unable to play sound.");
                 }
             } else
             {

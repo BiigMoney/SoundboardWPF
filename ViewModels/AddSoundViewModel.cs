@@ -92,6 +92,12 @@ namespace SoundboardWPF.ViewModels
 
         private String filename;
         private double length;
+
+        public AddSoundViewModel()
+        {
+            GlobalFFOptions.Configure(new FFOptions { BinaryFolder = "./", TemporaryFilesFolder = "/tmp" });
+        }
+
         public void OpenFile(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -118,7 +124,6 @@ namespace SoundboardWPF.ViewModels
         {
             FileSelect = Visibility.Hidden;
             YoutubeSelect = Visibility.Visible;
-            Console.WriteLine(YoutubeSelect);
         }
 
         public void SaveSound(object sender, RoutedEventArgs e)

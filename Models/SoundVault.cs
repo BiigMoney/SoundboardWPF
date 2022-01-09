@@ -30,10 +30,11 @@ namespace SoundboardWPF.Models
             try
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("select * from soundboard_sound limit 200", conn);
+                MySqlCommand cmd = new MySqlCommand("select s.id, name, length, soundFile, count(l.id) as likes from soundboard_sound s left join soundboard_sound_likes l on s.id = l.sound_id group by s.id  order by id asc limit 200", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
+                    string likes = reader["likes"].ToString();
                     string name = reader["name"].ToString();
                     string length = reader["length"].ToString();
                     string soundFile = reader["soundFile"].ToString();
@@ -42,7 +43,7 @@ namespace SoundboardWPF.Models
                     {
                         canDownload = false;
                     }
-                    sounds.Add(new SoundVaultSound(name, length, soundFile, canDownload));
+                    sounds.Add(new SoundVaultSound(name, length, soundFile, canDownload, likes));
                 }
             }
             finally

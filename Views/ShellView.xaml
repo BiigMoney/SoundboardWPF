@@ -24,7 +24,9 @@
         <Button Grid.Column="2" Width="100" Height="30" x:Name="OpenMySounds">My Sounds</Button>
         <Button Grid.Column="3" Width="100" Height="30" x:Name="OpenAddSound">Add Sound</Button>
         <Button Grid.Column="4" Width="100" Height="30" x:Name="OpenBrowseSounds">Browse Sounds</Button>
-        <Button Grid.Column="5" Width="20" Height="20" HorizontalAlignment="Right" x:Name="OpenSettings">S</Button>
+        <Button Grid.Column="5" Width="30" Height="30" HorizontalAlignment="Right" x:Name="OpenSettings">
+            <Image Source="https://icons.iconarchive.com/icons/hopstarter/soft-scraps/24/Gear-icon.png"/>
+        </Button>
         <ContentControl Grid.Row="1" Grid.ColumnSpan="5" Grid.Column="1" x:Name="ActiveItem" HorizontalAlignment="Center"/>
     </Grid>
 </mah:MetroWindow>

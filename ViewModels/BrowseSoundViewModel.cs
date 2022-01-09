@@ -16,7 +16,7 @@ namespace SoundboardWPF.ViewModels
     class BrowseSoundViewModel : Screen
     {
         private BindableCollection<SoundVaultSound> _soundList;
-        private readonly int soundsPerPage = 1;
+        private readonly int soundsPerPage = 10;
         public BindableCollection<SoundVaultSound> SoundList { 
             get { return _soundList; } 
             set {
@@ -171,7 +171,7 @@ namespace SoundboardWPF.ViewModels
             }
             catch(MySqlException ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message);
                 ShowError = Visibility.Visible;
             }
             finally
