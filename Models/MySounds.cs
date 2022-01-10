@@ -40,7 +40,21 @@ namespace SoundboardWPF.Models
         public MySounds()
         {
             doc.PreserveWhitespace = true;
-            doc.Load(@".\sounds.xml");
+            try
+            {
+                doc.Load(@".\sounds.xml");
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message);
+                File.WriteAllText("./sounds.xml", "<sounds> </sounds>");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                MessageBox.Show("Unable to open sound list.");
+                return;
+            }
             XmlNodeList sounds = doc.SelectNodes("/sounds/sound");
             foreach (XmlNode item in sounds)
             {

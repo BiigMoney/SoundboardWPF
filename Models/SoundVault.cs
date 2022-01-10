@@ -30,7 +30,7 @@ namespace SoundboardWPF.Models
             try
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("select s.id, name, length, soundFile, count(l.id) as likes from soundboard_sound s left join soundboard_sound_likes l on s.id = l.sound_id group by s.id  order by id asc limit 200", conn);
+                MySqlCommand cmd = new MySqlCommand("select s.id, name, length, soundFile, count(l.id) as likes from soundboard_sound s left join soundboard_sound_likes l on s.id = l.sound_id group by s.id  order by id desc limit 200", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -39,7 +39,14 @@ namespace SoundboardWPF.Models
                     string length = reader["length"].ToString();
                     string soundFile = reader["soundFile"].ToString();
                     bool canDownload = true;
-                    if (MySounds.Sounds.Any(sound => sound.Path.Split('/').GetValue(sound.Path.Split('/').Length - 1).ToString() == soundFile))
+                    if (MySounds.Sounds.Any(sound => {
+                        string path = sound.Path.Split('/').GetValue(sound.Path.Split('/').Length - 1).ToString();
+                        if (path.Split('.')[0].Length > 8)
+                        {
+                            return path.Split('.')[0].Substring(8) + '.' + path.Split('.')[1] == soundFile;
+                        }
+                        return false;
+                       }))
                     {
                         canDownload = false;
                     }
@@ -185,7 +192,7 @@ namespace SoundboardWPF.Models
 
         private static void DownloadSoundFromURL(string url, string name)
         {
-            string path = "./" + url;
+            string path = "./sounds/"+ Guid.NewGuid().ToString("n").Substring(0, 8) + url;
             try
             {
                 GetObjectRequest request = new GetObjectRequest()

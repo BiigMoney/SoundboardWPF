@@ -47,11 +47,10 @@ namespace SoundboardWPF.Models
             }
             catch (ParsingException ex)
             {
-                MessageBox.Show("Error " + ex.ToString());
                 WriteNewConfig(50, "None");
             }
             catch (Exception ex) {
-                MessageBox.Show("Error " + ex.ToString());
+                MessageBox.Show("Could not read config file.");
                 Volume = 50;
                 SecondaryAudioDeviceID = -1;
                 SecondaryOutputDevice = "None";

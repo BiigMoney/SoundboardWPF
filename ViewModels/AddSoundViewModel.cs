@@ -111,7 +111,6 @@ namespace SoundboardWPF.ViewModels
                     filename = dialog.FileName;
                     FileSelect = Visibility.Visible;
                     YoutubeSelect = Visibility.Hidden;
-                    Console.WriteLine(FileSelect);
                 }
                 else
                 {
@@ -175,18 +174,44 @@ namespace SoundboardWPF.ViewModels
             if (regRes.Success)
             {
                 Progress = "Fetching...";
-                var youtube = new YoutubeClient();
-                var streamManifest = await youtube.Videos.Streams.GetManifestAsync(regRes.Groups[1].Value);
-                var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+
+                IStreamInfo streamInfo = null;
+                YoutubeClient youtube = null;
+                try
+                {
+                    youtube = new YoutubeClient();
+                    var streamManifest = await youtube.Videos.Streams.GetManifestAsync(regRes.Groups[1].Value);
+                    streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+                } catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Progress = "";
+                    MessageBox.Show("Could not get youtube data.");
+                    return;
+                }
                 Progress = "Downloading...";
                 string rand = Guid.NewGuid().ToString("n").Substring(0, 8);
-                string VidName = rand + "." + streamInfo.Container;
-                string OutName = rand + ".mp3";
+                Directory.CreateDirectory("./sounds");
+                string VidName = "./sounds/" + rand + "." + streamInfo.Container;
+                string OutName = "./sounds/" + rand + ".mp3";
                 await youtube.Videos.Streams.DownloadAsync(streamInfo, VidName);
                 Progress = "Converting...";
+
                 try
                 {
                     await FFMpegArguments.FromFileInput(VidName).OutputToFile(OutName).ProcessAsynchronously();
+                }
+
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    MessageBox.Show("Could not find FFmpeg executable, you should reinstall SoundVaultPro.");
+                    Progress = "";
+                    return;
+                }
+
+                try
+                {
 
                     if (ClipCheck)
                     {
@@ -205,6 +230,7 @@ namespace SoundboardWPF.ViewModels
                 {
                     Console.WriteLine(ex.ToString());
                     MessageBox.Show("There was an error while converting the sound, the sound was not saved.");
+                    Progress = "";
                     return;
                 }
                 

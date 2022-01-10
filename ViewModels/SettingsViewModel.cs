@@ -86,7 +86,6 @@ namespace SoundboardWPF.ViewModels
 
         public SettingsViewModel()
         {
-            Console.WriteLine(StartIndex);
             foreach(string device in Settings.AudioDevices)
             {
                 AudioDevices.Add(device);

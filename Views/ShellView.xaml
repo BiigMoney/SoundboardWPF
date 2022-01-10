@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:SoundboardWPF.Views"
         mc:Ignorable="d"
         Height="450" Width="800"
-        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
+        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        Title="SoundVaultPro"
+                 >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
